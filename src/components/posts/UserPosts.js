@@ -7,8 +7,15 @@ import { firestoreConnect } from "react-redux-firebase";
 import Spinner from "../layout/Spinner";
 
 class UserPosts extends Component {
+  onDelete = id => {
+    const { firestore } = this.props;
+    firestore.delete({ collection: "posts", doc: id });
+  };
+
   render() {
-    const { posts } = this.props;
+    const { posts, auth } = this.props;
+
+    posts = posts.filter(post => post.user);
 
     if (posts) {
       return (
@@ -26,7 +33,7 @@ class UserPosts extends Component {
                 </div>
               </div>
             </div>
-            <hr />
+
             <table className="table table-striped">
               <thead className="thead-inverse">
                 <tr>
@@ -42,12 +49,15 @@ class UserPosts extends Component {
                     <td>{post.description}</td>
                     <td>
                       <Link
-                        to={`/posts/${post.id}`}
+                        to={`/posts/edit/${post.id}`}
                         className="btn btn-secondary btn-sm"
                       >
                         <i className="fas fa-pencil-alt" />
-                      </Link>
-                      <button className="btn btn-danger-sm">
+                      </Link>{" "}
+                      <button
+                        className="btn btn-danger btn-sm"
+                        onClick={this.onDelete.bind(this, post.id)}
+                      >
                         <i className="fas fa-times" />
                       </button>
                     </td>
@@ -65,8 +75,7 @@ class UserPosts extends Component {
 }
 
 UserPosts.propTypes = {
-  firestore: PropTypes.object.isRequired,
-  posts: PropTypes.array.isRequired
+  firestore: PropTypes.object.isRequired
 };
 
 export default compose(
@@ -76,6 +85,7 @@ export default compose(
     }
   ]),
   connect((state, props) => ({
-    posts: state.firestore.ordered.posts
+    posts: state.firestore.ordered.posts,
+    auth: state.firebase.auth
   }))
 )(UserPosts);
