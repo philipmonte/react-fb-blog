@@ -13,6 +13,7 @@ import AddPost from "./components/posts/AddPost";
 import UserPosts from "./components/posts/UserPosts";
 import EditPost from "./components/posts/EditPost";
 import Login from "./components/auth/Login";
+import Register from "./components/auth/Register";
 
 class App extends Component {
   render() {
@@ -43,6 +44,11 @@ class App extends Component {
                   exact
                   path="/login"
                   component={UserIsNotAuthenticated(Login)}
+                />
+                <Route
+                  exact
+                  path="/register"
+                  component={UserIsNotAuthenticated(Register)}
                 />
               </Switch>
             </div>

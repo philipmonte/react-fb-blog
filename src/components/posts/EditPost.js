@@ -16,6 +16,20 @@ class EditPost extends Component {
     this.descriptionInput = React.createRef();
   }
 
+  state = null;
+
+  static getDerivedStateFromProps(props, state) {
+    const { auth, post, history } = props;
+
+    try {
+      if (auth.uid !== post.uid) {
+        history.push("/");
+      }
+    } catch (e) {
+      return null;
+    }
+  }
+
   onSubmit = e => {
     e.preventDefault();
 
@@ -49,7 +63,7 @@ class EditPost extends Component {
           <div className="col-md-8 mx-auto">
             <div className="row">
               <div className="col-md-6">
-                <h3 className="font-italic  ">Add New Post</h3>
+                <h3 className="font-italic  ">Edit Post</h3>
               </div>
               <div className="col-md-6">
                 <div className="btn-group float-right">
@@ -72,6 +86,7 @@ class EditPost extends Component {
                       onChange={this.onChange}
                       defaultValue={author}
                       ref={this.authorInput}
+                      disabled
                     />
                   </div>
                 </div>
@@ -85,6 +100,7 @@ class EditPost extends Component {
                       onChange={this.onChange}
                       defaultValue={dateAdded}
                       ref={this.dateAddedInput}
+                      disabled
                     />
                   </div>
                 </div>
@@ -135,7 +151,8 @@ export default compose(
       doc: props.match.params.id
     }
   ]),
-  connect(({ firestore: { ordered } }) => ({
-    post: ordered.post && ordered.post[0]
+  connect(({ firestore: { ordered }, firebase: { auth } }) => ({
+    post: ordered.post && ordered.post[0],
+    auth: auth
   }))
 )(EditPost);

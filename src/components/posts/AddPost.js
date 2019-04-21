@@ -1,13 +1,40 @@
 import React, { Component } from "react";
 import { firestoreConnect } from "react-redux-firebase";
+import PropTypes from "prop-types";
+import { compose } from "redux";
+import { connect } from "react-redux";
 
 class AddPost extends Component {
   state = {
+    uid: "",
     title: "",
     description: "",
     author: "",
     dateAdded: ""
   };
+
+  constructor() {
+    super();
+
+    const DATE_OPTIONS = {
+      year: "numeric",
+      month: "short",
+      day: "numeric"
+    };
+
+    this.state.dateAdded = new Date().toLocaleDateString("en-US", DATE_OPTIONS);
+  }
+
+  static getDerivedStateFromProps(props, state) {
+    const { auth } = props;
+
+    if (auth.uid) {
+      return {
+        uid: auth.uid,
+        author: auth.email.substring(0, auth.email.indexOf("@"))
+      };
+    }
+  }
 
   onChange = e => this.setState({ [e.target.name]: e.target.value });
 
@@ -21,6 +48,8 @@ class AddPost extends Component {
       .add({ collection: "posts" }, newPost)
       .then(() => history.push("/"));
   };
+
+  setDate = () => {};
 
   render() {
     const { title, description, author, dateAdded } = this.state;
@@ -50,7 +79,7 @@ class AddPost extends Component {
                     type="text"
                     className="form-control"
                     name="author"
-                    onChange={this.onChange}
+                    disabled
                     value={author}
                   />
                 </div>
@@ -62,7 +91,7 @@ class AddPost extends Component {
                     type="text"
                     className="form-control"
                     name="dateAdded"
-                    onChange={this.onChange}
+                    disabled
                     value={dateAdded}
                   />
                 </div>
@@ -97,4 +126,9 @@ class AddPost extends Component {
   }
 }
 
-export default firestoreConnect()(AddPost);
+export default compose(
+  firestoreConnect(),
+  connect((state, props) => ({
+    auth: state.firebase.auth
+  }))
+)(AddPost);

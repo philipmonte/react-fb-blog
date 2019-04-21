@@ -15,9 +15,8 @@ class UserPosts extends Component {
   render() {
     const { posts, auth } = this.props;
 
-    posts = posts.filter(post => post.user);
-
     if (posts) {
+      const userPosts = posts.filter(post => post.uid === auth.uid);
       return (
         <div>
           <div className="col-md-8 mx-auto">
@@ -43,7 +42,7 @@ class UserPosts extends Component {
                 </tr>
               </thead>
               <tbody>
-                {posts.map(post => (
+                {userPosts.map(post => (
                   <tr key={post.id}>
                     <td>{post.title}</td>
                     <td>{post.description}</td>
